@@ -1,12 +1,17 @@
 <?php
 
 /**
- * Implements hook_perm().
+ * Implements hook_permission().
  */
-function convio_api_perm() {
+function convio_api_permission() {
+
   return array(
-    'administer convio api settings',
+    'administer convio api settings' => array(
+      'title' => t('Administer Convio API Settings'),
+      'description' => t('Set up the parameters for using the Convio API.'),
+    ),
   );
+
 }
 
 /**
@@ -15,14 +20,24 @@ function convio_api_perm() {
 function convio_api_menu() {
   $items = array();
   
-  $items['admin/config/system/convio_api'] = array(
-    'title' => 'Convio API',
-    'description' => 'Manage settings to connect with a Convio Site',
+  $items['admin/config/system/convio_api_config'] = array(
+    'title' => 'Convio API Configuration',
+    'description' => 'Manage settings to connect with the Convio API',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('convio_api_admin_site_settings'),
-    'access callback' => 'user_access',
     'access arguments' => array('administer convio api settings'),
     'file' => 'include/convio_api.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/config/system/convio_api_test'] = array(
+    'title' => 'Convio API Connection Test',
+    'description' => 'Test the connection to the Convio Site',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('convio_api_admin_site_test'),
+    'access arguments' => array('administer convio api settings'),
+    'file' => 'include/convio_api.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
   
   return $items;
