@@ -25,9 +25,9 @@ class ConvioAPI {
       $this->api = $api;
       if (in_array($method, $this->api_data[$api]['supported_methods'])) {
         $this->method = $method;
-        $this->config = $this->get_configuration();
-        $this->params = $this->get_params($params);
-        $this->request_url = $this->get_url();
+        $this->get_configuration();
+        $this->get_params($params);
+        $this->get_request_url();
       }
       else {
         throw new Exception("API $api does not support method $method");
@@ -52,14 +52,13 @@ class ConvioAPI {
    *
    */
   private function get_configuration() {
-    $config = array(
+    $this->config = array(
       'convio_api_username' => variable_get('convio_api_username', ''),
       'convio_api_password' => variable_get('convio_api_password', ''),
       'convio_api_key' => variable_get('convio_api_key', ''),
       'convio_api_site_id' => variable_get('convio_api_site_id', ''),
       'convio_api_site_url' => variable_get('convio_api_site_url', 'https://secure2.convio.net/'),
     );
-    return $config;
   }
 
   private function get_params($params) {
@@ -76,12 +75,12 @@ class ConvioAPI {
       );
     }
 
-    return $params;
+    $this->params = $params;
   }
 
-  private function get_url() {
+  private function get_request_url() {
     $method_path = ($this->method === 'client') ? 'CR' : 'SR';
-    return $this->config['convio_api_site_url'] . $this->config['convio_api_site_id'] . '/site/' . $method_path . $this->api_data[$this->api]['path'];
+    $this->request_url = $this->config['convio_api_site_url'] . $this->config['convio_api_site_id'] . '/site/' . $method_path . $this->api_data[$this->api]['path'];
   }
   
   public function execute() {
