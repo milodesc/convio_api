@@ -65,12 +65,6 @@ function convio_api_admin_site_settings_validate($form, &$form_state) {
   }
 }
 
-
-
-
-
-
-
 function convio_api_admin_site_test() {
     $form = array();
 
@@ -79,7 +73,6 @@ function convio_api_admin_site_test() {
         '#title' => t('E-Mail'),
         '#required' => TRUE,
         '#description' => t('An e-mail address to test for validity (e.g. test@example.com).'),
-        // '#default_value' => "test@example.com",
     );
 
     $form['submit'] = array(
@@ -110,11 +103,7 @@ function convio_api_admin_site_test_validate($form, &$form_state) {
  */
 function convio_api_admin_site_test_submit($form, &$form_state) {
 
-  $params = array(
-    'email' => $form_state['values']['convio_api_email'],
-    'method' => 'isEmailValid',
-  );
-  $response = convio_api_request($params, 'constituent', 'server');
+  $response = convio_api_isEmailValid_request($form_state['values']['convio_api_email']);
 
   $responseData = (!empty($response->data)) ? drupal_json_decode($response->data) : "";
   if (!empty($response->error)) {
