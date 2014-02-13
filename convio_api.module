@@ -67,7 +67,7 @@ function convio_api_request($api, $method, $params) {
 }
 
 /**
- * Execute an isEmailValid Convio API request.
+ * Execute an isEmailValid Convio API request. Documentation of this request is available here: http://open.convio.com/api/#constituent_api.isEmailValid_method.html
  *
  * @param $email
  *   The email address to check for validity.
@@ -83,6 +83,15 @@ function convio_api_isEmailValid_request($email) {
   return convio_api_request('constituent', 'server', $params);
 }
 
+/**
+ * Execute an isEmailValid Convio API request. Documentation of this request is available here: http://open.convio.com/api/#constituent_api.createOrUpdate_method.html
+ *
+ * @param $email
+ *   The email address of the user to create or update.
+ *
+ * @return
+ *   An array containing the constituent ID of the user created or updated and message.
+ */
 function convio_api_createOrUpdate_request($email) {
   $params = array(
     'email' => $email,
