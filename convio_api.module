@@ -44,10 +44,17 @@ function convio_api_menu() {
 }
 
 /**
- * Execute request to Convio API
+ * Configure and execute a request to the Convio API
+ *
+ * @param $api
+ *   The name of the subset of Convio API commands that contains this command
+ * @param $method
+ *   The origin of the Convio API request, "client" or "server". Server requests must be preconfigured on Convio to have access to all Convio API requests withouth authentication.
+ * @param $params
+ *   The optional and required parameters for this type of API request.
  *
  * @return 
- * Return the response that is generated.
+ *   Convio's response to the API request
  */
 function convio_api_request($api, $method, $params) {
   try {
@@ -59,6 +66,15 @@ function convio_api_request($api, $method, $params) {
   } 
 }
 
+/**
+ * Execute an isEmailValid Convio API request.
+ *
+ * @param $email
+ *   The email address to check for validity.
+ *
+ * @return
+ *   TRUE if Convio considers the email address to be valid. FALSE if Convio considers the email address to be invalid.
+ */
 function convio_api_isEmailValid_request($email) {
   $params = array(
     'email' => $email,
