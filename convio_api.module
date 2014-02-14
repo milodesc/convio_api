@@ -57,13 +57,24 @@ function convio_api_menu() {
  *   Convio's response to the API request
  */
 function convio_api_request($api, $method, $params) {
-  try {
-    $convio_api = new ConvioAPI($api, $method, $params);
-    return $convio_api->execute();
+  $convio_api = new ConvioAPI($api, $method, $params);
+  $response = $convio_api->execute();
+
+  $response_decoded = drupal_json_decode($response->data);
+  if (!empty($response->error)) {
+    if (empty($response_decoded)) {
+      // The request never made it to the Convio API
+      $error_message = "There was a connection error! Check the API Base URL and Name of Organization fields.";
+    }
+    else {
+      // The Convio API returned and error message
+      $error_message = "There was a Convio error: " . $response_decoded['errorResponse']['message'];
+    }
+    watchdog('convio_api', $error_message, array(), WATCHDOG_ERROR);
+    throw new Exception($error_message);
   }
-  catch (Exception $e) {
-    watchdog('convio_api', $e->getMessage(), array(), WATCHDOG_ERROR);
-  } 
+
+  return $response_decoded;
 }
 
 /**
@@ -84,13 +95,13 @@ function convio_api_isEmailValid_request($email) {
 }
 
 /**
- * Execute an isEmailValid Convio API request. Documentation of this request is available here: http://open.convio.com/api/#constituent_api.createOrUpdate_method.html
+ * Execute a createOrUpdate Convio API request. Documentation of this request is available here: http://open.convio.com/api/#constituent_api.createOrUpdate_method.html
  *
  * @param $email
  *   The email address of the user to create or update.
  *
  * @return
- *   An array containing the constituent ID of the user created or updated and message.
+ *   An array containing the constituent ID of the user created or updated and a message.
  */
 function convio_api_createOrUpdate_request($email) {
   $params = array(

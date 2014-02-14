@@ -102,21 +102,14 @@ function convio_api_admin_site_test_validate($form, &$form_state) {
  * Implements hook_form_submit
  */
 function convio_api_admin_site_test_submit($form, &$form_state) {
-
-  $response = convio_api_isEmailValid_request($form_state['values']['convio_api_email']);
-
-  $responseData = (!empty($response->data)) ? drupal_json_decode($response->data) : "";
-  if (!empty($response->error)) {
-    $connectionUnsuccessful = 'Could not connect to Convio API with the information provided. ';
-    if(!empty($responseData)) {
-      form_set_error('', $connectionUnsuccessful . $responseData['errorResponse']['message']);
-    }
-    else {
-      form_set_error('', $connectionUnsuccessful . "Check the API Base URL and Name of Organization fields on the Convio API Configuration screen.");
-    }
+  try {
+    $response = convio_api_isEmailValid_request($form_state['values']['convio_api_email']);
   }
-  else {
-    $validity = ($responseData['isEmailValidResponse']['valid'] === 'true') ? "a valid" : "an invalid";
-    drupal_set_message('Connection to Convio API was successful. ' . $form_state['values']['convio_api_email'] . " is " . $validity . " email address.");
+  catch (Exception $e) {
+    form_set_error('', $e->getMessage());
+    return;
   }
+
+  $validity = ($response['isEmailValidResponse']['valid'] === 'true') ? "a valid" : "an invalid";
+  drupal_set_message('Connection to Convio API was successful. ' . $form_state['values']['convio_api_email'] . " is " . $validity . " email address.");
 }
