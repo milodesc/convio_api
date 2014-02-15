@@ -110,9 +110,4 @@ function convio_api_createOrUpdate_request($email) {
   );
 
   $api_response = convio_api_request('constituent', 'server', $params);
-
-//    return array(
-//      "message" => $data['message'],
-//      "cons_id" => $data['cons_id'],
-//    );
 }
