@@ -88,7 +88,7 @@ function convio_api_request($api, $method, $required_params, $optional_params = 
  *   An array of optional parameters to send to the Convio API for this request
  *
  * @return
- *   TRUE if Convio considers the email address to be valid. FALSE if Convio considers the email address to be invalid.
+ *   An array with a key of "isEmailValidResponse" whose value is an array with a key of "valid" and a value of "true" or "false" (e.g. ["isEmailValidResponse" => ["valid" => "true"]]
  */
 function convio_api_isEmailValid_request($email, $optional_params = array()) {
   $required_params = array(
@@ -109,7 +109,7 @@ function convio_api_isEmailValid_request($email, $optional_params = array()) {
  *   An array of optional parameters to send to the Convio API for this request
  *
  * @return
- *   An array containing the constituent ID of the user created or updated and a message.
+ *   An array with a key of "createOrUpdateConsResponse" whose value is an array with 2 elements, one with a key of "message" and the other with a key of "cons_id" and a value of the constituent ID of the user that was updated or created.
  */
 function convio_api_createOrUpdate_request($email, $optional_params = array()) {
   $required_params = array(
