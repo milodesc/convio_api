@@ -93,9 +93,6 @@ function convio_api_isEmailValid_request($email, $optional_params = array()) {
     'method' => 'isEmailValid',
   );
 
-  $optional_params = array(
-    'test_param' => "meatball",
-  );
   return convio_api_request('constituent', 'server', $required_params, $optional_params);
 }
 
@@ -108,11 +105,11 @@ function convio_api_isEmailValid_request($email, $optional_params = array()) {
  * @return
  *   An array containing the constituent ID of the user created or updated and a message.
  */
-function convio_api_createOrUpdate_request($email) {
-  $params = array(
+function convio_api_createOrUpdate_request($email, $optional_params = array()) {
+  $required_params = array(
     'email' => $email,
     'method' => 'createOrUpdate',
   );
 
-  $api_response = convio_api_request('constituent', 'server', $params);
+  $api_response = convio_api_request('constituent', 'server', $required_params, $optional_params);
 }
