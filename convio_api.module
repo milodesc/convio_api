@@ -84,6 +84,9 @@ function convio_api_request($api, $method, $required_params, $optional_params = 
  * @param $email
  *   The email address to check for validity.
  *
+ * @param $optional_params
+ *   An array of optional parameters to send to the Convio API for this request
+ *
  * @return
  *   TRUE if Convio considers the email address to be valid. FALSE if Convio considers the email address to be invalid.
  */
@@ -101,6 +104,9 @@ function convio_api_isEmailValid_request($email, $optional_params = array()) {
  *
  * @param $email
  *   The email address of the user to create or update.
+ *
+ * @param $optional_params
+ *   An array of optional parameters to send to the Convio API for this request
  *
  * @return
  *   An array containing the constituent ID of the user created or updated and a message.
