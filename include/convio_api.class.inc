@@ -20,13 +20,13 @@ class ConvioAPI {
   private $params;
   private $request_url;
   
-  public function __construct($api, $method, $params) {
+  public function __construct($api, $method, $required_params, $optional_params) {
     if (!empty($this->api_data[$api])) {
       $this->api = $api;
       if (in_array($method, $this->api_data[$api]['supported_methods'])) {
         $this->method = $method;
         $this->get_configuration();
-        $this->get_params($params);
+        $this->get_params($required_params, $optional_params);
         $this->get_request_url();
       }
       else {
@@ -61,7 +61,8 @@ class ConvioAPI {
     );
   }
 
-  private function get_params($params) {
+  private function get_params($required_params, $optional_params) {
+    $params = $required_params;
     $params += array(
       'api_key' => $this->config['convio_api_key'],
       'v' => '1.0',
@@ -74,6 +75,8 @@ class ConvioAPI {
         'login_password' => $this->config['convio_api_password'],
       );
     }
+
+    $params = array_merge($params, $optional_params);
 
     $this->params = $params;
   }

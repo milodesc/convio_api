@@ -56,10 +56,11 @@ function convio_api_menu() {
  * @return 
  *   Convio's response to the API request
  */
-function convio_api_request($api, $method, $params) {
-  $convio_api = new ConvioAPI($api, $method, $params);
+function convio_api_request($api, $method, $required_params, $optional_params = array()) {
+  $convio_api = new ConvioAPI($api, $method, $required_params, $optional_params);
   $response = $convio_api->execute();
 
+  watchdog('convio_api', $response->request);
   $response_decoded = drupal_json_decode($response->data);
   if (!empty($response->error)) {
     if (empty($response_decoded)) {
@@ -86,12 +87,16 @@ function convio_api_request($api, $method, $params) {
  * @return
  *   TRUE if Convio considers the email address to be valid. FALSE if Convio considers the email address to be invalid.
  */
-function convio_api_isEmailValid_request($email) {
-  $params = array(
+function convio_api_isEmailValid_request($email, $optional_params = array()) {
+  $required_params = array(
     'email' => $email,
     'method' => 'isEmailValid',
   );
-  return convio_api_request('constituent', 'server', $params);
+
+  $optional_params = array(
+    'test_param' => "meatball",
+  );
+  return convio_api_request('constituent', 'server', $required_params, $optional_params);
 }
 
 /**
