@@ -117,5 +117,5 @@ function convio_api_createOrUpdate_request($email, $optional_params = array()) {
     'method' => 'createOrUpdate',
   );
 
-  $api_response = convio_api_request('constituent', 'server', $required_params, $optional_params);
+  return convio_api_request('constituent', 'server', $required_params, $optional_params);
 }
