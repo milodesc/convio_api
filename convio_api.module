@@ -60,12 +60,17 @@ function convio_api_request($api, $method, $required_params, $optional_params = 
   $convio_api = new ConvioAPI($api, $method, $required_params, $optional_params);
   $response = $convio_api->execute();
 
-  watchdog('convio_api', $response->request);
-  $response_decoded = drupal_json_decode($response->data);
+  //watchdog('convio_api', $response->request);
+  $response_decoded = array();
+  if(!empty($response->data)) {
+    $response_decoded = drupal_json_decode($response->data);
+  }
+
+  // Handle errors
   if (!empty($response->error)) {
-    if (empty($response_decoded)) {
+    if (empty($response_decoded) || empty($response_decoded['errorResponse']['message'])) {
       // The request never made it to the Convio API
-      $error_message = "There was a connection error! Check the API Base URL and Name of Organization fields.";
+      $error_message = "There was a connection error! Check your internet connection, that your IP address is whitelisted at Convio, and your API Base URL and Name of Organization field setups.";
     }
     else {
       // The Convio API returned and error message
