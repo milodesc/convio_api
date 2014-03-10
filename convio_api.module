@@ -60,7 +60,6 @@ function convio_api_request($api, $method, $required_params, $optional_params = 
   $convio_api = new ConvioAPI($api, $method, $required_params, $optional_params);
   $response = $convio_api->execute();
 
-  //watchdog('convio_api', $response->request);
   $response_decoded = array();
   if(!empty($response->data)) {
     $response_decoded = drupal_json_decode($response->data);
