@@ -44,47 +44,82 @@ function convio_api_menu() {
 }
 
 /**
- * Build the configuration array for a convio api request.
+ * Configure and execute a request to the Convio API
  *
- * @return array
- *   An array containing the configuration for a Convio API request.
- *   Includes the keys:
- *     - convio_api_username
- *     - convio_api_password
- *     - convio_api_key
- *     - convio_api_site_id
- *     - convio_api_site_url
- *     
+ * @param $api
+ *   The name of the subset of Convio API commands that contains this command
+ * @param $method
+ *   The origin of the Convio API request, "client" or "server". Server requests must be preconfigured on Convio to have access to all Convio API requests withouth authentication.
+ * @param $params
+ *   The optional and required parameters for this type of API request.
+ *
+ * @return 
+ *   Convio's response to the API request
  */
-function convio_api_get_configuration() {
-  static $config;
-  
-  if (!$config) {
-    $config = array(
-      'convio_api_username' => variable_get('convio_api_username', ''),
-      'convio_api_password' => variable_get('convio_api_password', ''),
-      'convio_api_key' => variable_get('convio_api_key', ''),
-      'convio_api_site_id' => variable_get('convio_api_site_id', ''),
-      'convio_api_site_url' => variable_get('convio_api_site_url', 'https://secure2.convio.net/'),
-    );
+function convio_api_request($api, $method, $required_params, $optional_params = array()) {
+  $convio_api = new ConvioAPI($api, $method, $required_params, $optional_params);
+  $response = $convio_api->execute();
+
+  $response_decoded = array();
+  if(!empty($response->data)) {
+    $response_decoded = drupal_json_decode($response->data);
   }
-  return $config;
+
+  // Handle errors
+  if (!empty($response->error)) {
+    if (empty($response_decoded) || empty($response_decoded['errorResponse']['message'])) {
+      // The request never made it to the Convio API
+      $error_message = "There was a connection error! Check your internet connection, that your IP address is whitelisted at Convio, and your API Base URL and Name of Organization field setups.";
+    }
+    else {
+      // The Convio API returned and error message
+      $error_message = "There was a Convio error: " . $response_decoded['errorResponse']['message'];
+    }
+    watchdog('convio_api', $error_message, array(), WATCHDOG_ERROR);
+    throw new Exception($error_message);
+  }
+
+  return $response_decoded;
 }
 
 /**
- * Execute request to Convio API
+ * Execute an isEmailValid Convio API request. Documentation of this request is available here: http://open.convio.com/api/#constituent_api.isEmailValid_method.html
  *
- * @return 
- * Return the response that is generated.
+ * @param $email
+ *   The email address to check for validity.
+ *
+ * @param $optional_params
+ *   An array of optional parameters to send to the Convio API for this request
+ *
+ * @return
+ *   An array with a key of "isEmailValidResponse" whose value is an array with a key of "valid" and a value of "true" or "false" (e.g. ["isEmailValidResponse" => ["valid" => "true"]]
  */
-function convio_api_request($params = array(), $api = 'constituent', $request_type = 'client') {
-  $config = convio_api_get_configuration();
-  try {
-    $convio = new ConvioAPI($api, $request_type, $config);
-    $convio->setParams($params);
-    return $convio->execute();
-  }
-  catch (Exception $e) {
-    watchdog('convio_api', $e->getMessage(), array(), WATCHDOG_ERROR);
-  } 
+function convio_api_isEmailValid_request($email, $optional_params = array()) {
+  $required_params = array(
+    'email' => $email,
+    'method' => 'isEmailValid',
+  );
+
+  return convio_api_request('constituent', 'server', $required_params, $optional_params);
+}
+
+/**
+ * Execute a createOrUpdate Convio API request. Documentation of this request is available here: http://open.convio.com/api/#constituent_api.createOrUpdate_method.html
+ *
+ * @param $email
+ *   The email address of the user to create or update.
+ *
+ * @param $optional_params
+ *   An array of optional parameters to send to the Convio API for this request
+ *
+ * @return
+ *   An array with a key of "createOrUpdateConsResponse" whose value is an array with 2 elements, one with a key of "message" and the other with a key of "cons_id" and a value of the constituent ID of the user that was updated or created.
+ */
+function convio_api_createOrUpdate_request($email, $optional_params = array()) {
+  $required_params = array(
+    'email' => $email,
+    'method' => 'createOrUpdate',
+  );
+
+  return convio_api_request('constituent', 'server', $required_params, $optional_params);
 }
